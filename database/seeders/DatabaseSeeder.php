@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             WindFarmSeeder::class,
             TurbineSeeder::class,
             ComponentSeeder::class,
-            GradeSeeder::class,
             InspectionSeeder::class,
         ]);
     }

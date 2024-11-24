@@ -18,6 +18,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('turbine_id')->constrained()->onDelete('cascade');
+            $table->integer('grade');
             $table->timestamps();
         });
     }

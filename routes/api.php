@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+use App\Http\Controllers\WindFarmController;
+use App\Http\Controllers\TurbineController;
+
+Route::get('/windfarms', [WindFarmController::class, 'index']); // Fetch all wind farms
+Route::get('/windfarm/{id}/turbines', [TurbineController::class, 'getTurbinesByWindFarm']); // Fetch turbines for a wind farm
+Route::get('/turbine/{id}', [TurbineController::class, 'getTurbineDetails']); // Fetch details of a specific turbine
+
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
