@@ -16,7 +16,7 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
 
                 {/* Route to Turbine Details */}
-                <Route path="/turbine/:turbineId" element={<TurbineDetails />} />
+                <Route path="/turbine/:id" element={<TurbineDetails />} />
             </Routes>
         </Router>
     );

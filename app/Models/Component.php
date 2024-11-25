@@ -9,9 +9,5 @@ class Component extends Model {
     public function turbine() {
         return $this->belongsTo(Turbine::class);
     }
-
-    public function grades() {
-        return $this->hasMany(Grade::class);
-    }
 }
 

@@ -32,24 +32,33 @@ class TurbineController extends Controller
 
     public function getTurbineDetails($turbineId)
     {
-        $turbine = Turbine::with(['components', 'inspections'])->findOrFail($turbineId);
-
+        // Fetch the turbine with related components and inspections
+        $turbine = Turbine::with(['components', 'inspections'])->find($turbineId);
+    
+        // Return a 404 error if the turbine is not found
+        if (!$turbine) {
+            return response()->json(['error' => 'Turbine not found'], 404);
+        }
+    
+        // Format and return the response
         return response()->json([
             'id' => $turbine->id,
             'name' => $turbine->name,
             'components' => $turbine->components->map(function ($component) {
                 return [
+                    'id' => $component->id,
                     'name' => $component->name,
-                    'grade' => $component->grade,
-                    'notes' => $component->notes
+                    'grade' => $component->grade ?? 'Not graded', // Fallback if grade is null
                 ];
             }),
             'inspections' => $turbine->inspections->map(function ($inspection) {
                 return [
-                    'date' => $inspection->inspection_date->format('Y-m-d'),
-                    'notes' => $inspection->inspection_notes
+                    'date' => $inspection->inspection_date 
+                        ? Carbon::parse($inspection->inspection_date)->format('Y-m-d')
+                        : 'Not inspected',
+                    'notes' => $inspection->inspection_notes ?? 'No notes available', // Fallback for missing notes
                 ];
-            })
+            }),
         ]);
-    }
+    }    
 }

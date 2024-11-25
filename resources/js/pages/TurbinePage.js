@@ -1,27 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useParams } from 'react-router-dom'; 
+
 
 const TurbinePage = () => {
-    const { id } = useParams();
     const [turbine, setTurbine] = useState(null);
+    const [error, setError] = useState(null);
+    const { id } = useParams();
 
-    useEffect(() => {
-        axios.get(`/api/turbine/${id}`)
-            .then(response => setTurbine(response.data))
-            .catch(error => console.error('Error fetching turbine details:', error));
-    }, [id]);
+    useEffect(() => { 
+        const fetchTurbine = async () => {
+            try {
+                const response = await axios.get(`/api/turbine/${id}`);
+                setTurbine(response.data);
+            } catch (err) {
+                setError('Error fetching turbine details');
+            }
+        };
+        fetchTurbine();
+    }, []);
 
-    if (!turbine) return <p>Loading...</p>;
+    if (error) {
+        return <div>{error}</div>;
+    }
+
+    if (!turbine) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="p-4">
             <h2 className="text-2xl font-semibold mb-4">{turbine.name}</h2>
-            <h3 className="text-xl mb-2">Components</h3>
+            <h3 className="text-xl font-medium mb-2">Components</h3>
             <ul>
                 {turbine.components.map((component, index) => (
-                    <li key={index} className="mb-2">
-                        <strong>{component.name}:</strong> Grade {component.grade} - {component.notes}
+                    <li key={index}>
+                        {component.name} - Grade: {component.grade}
+                    </li>
+                ))}
+            </ul>
+            <h3 className="text-xl font-medium mt-4">Inspections</h3>
+            <ul>
+                {turbine.inspections.map((inspection, index) => (
+                    <li key={index}>
+                        Date: {inspection.date} - Notes: {inspection.notes}
                     </li>
                 ))}
             </ul>
