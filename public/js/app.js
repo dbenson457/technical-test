@@ -2171,16 +2171,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Dashboard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/Dashboard */ "./resources/js/components/Dashboard.js");
 /* harmony import */ var _pages_TurbinePage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/TurbinePage */ "./resources/js/pages/TurbinePage.js");
 /* harmony import */ var _css_app_css__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../css/app.css */ "./resources/css/app.css");
-// resources/js/app.jsx
 
 
 
 
 
 
-// Import Tailwind CSS (Ensure you've installed Tailwind via npm)
+// Import Tailwind CSS
 
-function App() {
+var App = function App() {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.BrowserRouter, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Routes, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__.Route, {
     path: "/",
     element: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Dashboard__WEBPACK_IMPORTED_MODULE_2__["default"], null)
@@ -2188,11 +2187,14 @@ function App() {
     path: "/turbine/:id",
     element: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_pages_TurbinePage__WEBPACK_IMPORTED_MODULE_3__["default"], null)
   })));
-}
+};
 
-// Use React 18's root API to render the app
-var root = react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot(document.getElementById('app'));
-root.render(/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null));
+// Render the app using React 18's root API
+var rootElement = document.getElementById('app');
+if (rootElement) {
+  var root = react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot(rootElement);
+  root.render(/*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null));
+}
 
 /***/ }),
 
@@ -2232,6 +2234,7 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 
 
 var Dashboard = function Dashboard() {
+  // State to store the list of wind farms, selected farm, and associated turbines
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]),
     _useState2 = _slicedToArray(_useState, 2),
     windFarms = _useState2[0],
@@ -2244,45 +2247,45 @@ var Dashboard = function Dashboard() {
     _useState6 = _slicedToArray(_useState5, 2),
     turbines = _useState6[0],
     setTurbines = _useState6[1];
-  // Create a ref for the map instance
-  var mapRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
-  var defaultIcon = new (leaflet__WEBPACK_IMPORTED_MODULE_4___default().Icon)({
-    iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
-    iconSize: [25, 41],
-    // Size of the icon
-    iconAnchor: [12, 41],
-    // Anchor point of the icon
-    popupAnchor: [1, -34],
-    // Where the popup should open relative to the marker
-    shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
-    // Shadow image
-    shadowSize: [41, 41] // Size of the shadow
-  });
+
+  // Fetch the list of wind farms when the component mounts
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     axios__WEBPACK_IMPORTED_MODULE_1___default().get('/api/windfarms').then(function (response) {
-      return setWindFarms(response.data);
+      setWindFarms(response.data);
     })["catch"](function (error) {
-      return console.error('Error fetching wind farms:', error);
+      console.error('Error fetching wind farms:', error);
     });
   }, []);
+
+  // Fetch turbines for the selected wind farm when it changes
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     if (selectedFarm) {
       axios__WEBPACK_IMPORTED_MODULE_1___default().get("/api/windfarm/".concat(selectedFarm.id, "/turbines")).then(function (response) {
-        return setTurbines(response.data);
+        setTurbines(response.data);
       })["catch"](function (error) {
-        return console.error('Error fetching turbines:', error);
+        console.error('Error fetching turbines:', error);
       });
     }
   }, [selectedFarm]);
 
-  // Trigger map update when selectedFarm changes
+  // Update map view to center on the selected wind farm
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     if (selectedFarm && selectedFarm.latitude && selectedFarm.longitude && mapRef.current) {
-      // Recenter the map to the selected farm's coordinates
       mapRef.current.setView([selectedFarm.latitude, selectedFarm.longitude], 10);
     }
-  }, [selectedFarm]); // This hook runs whenever selectedFarm changes
+  }, [selectedFarm]); // This effect runs when `selectedFarm` changes
 
+  // Ref to store map instance to allow dynamic updates
+  var mapRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  // Default icon for map markers
+  var defaultIcon = new (leaflet__WEBPACK_IMPORTED_MODULE_4___default().Icon)({
+    iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
+    shadowSize: [41, 41]
+  });
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "h-screen flex flex-col bg-gray-100"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("header", {
@@ -2320,7 +2323,7 @@ var Dashboard = function Dashboard() {
       height: '400px',
       width: '100%'
     },
-    ref: mapRef // Assign the mapRef to the map container
+    ref: mapRef // Assign the mapRef to allow manipulation of the map instance
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_leaflet__WEBPACK_IMPORTED_MODULE_6__.TileLayer, {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(react_leaflet__WEBPACK_IMPORTED_MODULE_7__.Marker, {
@@ -2414,6 +2417,7 @@ function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 
 
 var TurbinePage = function TurbinePage() {
+  // State to store turbine details and error messages
   var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
     _useState2 = _slicedToArray(_useState, 2),
     turbine = _useState2[0],
@@ -2422,12 +2426,21 @@ var TurbinePage = function TurbinePage() {
     _useState4 = _slicedToArray(_useState3, 2),
     error = _useState4[0],
     setError = _useState4[1];
+
+  // Extracting the turbine id from URL parameters
   var _useParams = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_2__.useParams)(),
     id = _useParams.id;
-  var navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_2__.useNavigate)();
-  /* const [searchParams] = useSearchParams();
-  const windFarmId = searchParams.get('windFarmId'); Would've liked to go back to selected farm in Dashboard*/
 
+  // Hook to navigate between pages
+  var navigate = (0,react_router_dom__WEBPACK_IMPORTED_MODULE_2__.useNavigate)();
+
+  // Commented code: search params logic to remember the selected wind farm (optional feature, could not get to work)
+  /* 
+  const [searchParams] = useSearchParams();
+  const windFarmId = searchParams.get('windFarmId'); 
+  */
+
+  // Fetch turbine details when component mounts or id changes
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     var fetchTurbine = /*#__PURE__*/function () {
       var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -2458,12 +2471,16 @@ var TurbinePage = function TurbinePage() {
       };
     }();
     fetchTurbine();
-  }, [id]);
+  }, [id]); // Dependency array: refetch on id change
+
+  // Error state handling
   if (error) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "text-red-500 text-center mt-4"
     }, error);
   }
+
+  // Loading state while turbine data is being fetched
   if (!turbine) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "text-center mt-4"

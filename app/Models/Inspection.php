@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Inspection extends Model {
-    public function turbine() {
-        return $this->belongsTo(Turbine::class);
+// The WindFarm model represents a wind farm entity in the database
+class Inspection extends Model { 
+    // Define a relationship indicating that an inspection belongs to a turbine
+    public function turbine() { 
+        // Establish a many-to-one relationship with Turbine model
+        return $this->belongsTo(Turbine::class); 
     }
 }
 

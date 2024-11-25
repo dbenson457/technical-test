@@ -3,13 +3,23 @@ import axios from 'axios';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 
 const TurbinePage = () => {
+    // State to store turbine details and error messages
     const [turbine, setTurbine] = useState(null);
     const [error, setError] = useState(null);
-    const { id } = useParams();
-    const navigate = useNavigate();
-    /* const [searchParams] = useSearchParams();
-    const windFarmId = searchParams.get('windFarmId'); Would've liked to go back to selected farm in Dashboard*/
 
+    // Extracting the turbine id from URL parameters
+    const { id } = useParams();
+
+    // Hook to navigate between pages
+    const navigate = useNavigate();
+
+    // Commented code: search params logic to remember the selected wind farm (optional feature, could not get to work)
+    /* 
+    const [searchParams] = useSearchParams();
+    const windFarmId = searchParams.get('windFarmId'); 
+    */
+
+    // Fetch turbine details when component mounts or id changes
     useEffect(() => {
         const fetchTurbine = async () => {
             try {
@@ -20,19 +30,29 @@ const TurbinePage = () => {
             }
         };
         fetchTurbine();
-    }, [id]);
+    }, [id]); // Dependency array: refetch on id change
 
+    // Error state handling
     if (error) {
-        return <div className="text-red-500 text-center mt-4">{error}</div>;
+        return (
+            <div className="text-red-500 text-center mt-4">
+                {error}
+            </div>
+        );
     }
 
+    // Loading state while turbine data is being fetched
     if (!turbine) {
-        return <div className="text-center mt-4">Loading...</div>;
+        return (
+            <div className="text-center mt-4">
+                Loading...
+            </div>
+        );
     }
 
     return (
         <div className="p-6">
-            {/* Turbine Header */}
+            {/* Turbine Header Section */}
             <header className="bg-gray-800 text-white p-4 rounded shadow-md mb-6 flex justify-between items-center">
                 <h1 className="text-3xl font-bold">{turbine.name}</h1>
                 <button
@@ -43,6 +63,7 @@ const TurbinePage = () => {
                 </button>
             </header>
 
+            {/* Main content grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Components Section */}
                 <div className="bg-white shadow rounded p-4">

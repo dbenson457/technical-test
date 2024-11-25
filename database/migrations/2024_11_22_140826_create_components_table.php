@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        // Create 'components' table with id, name, foreign key to turbines, and timestamps
+        // Create 'components' table with id, name, foreign key to turbines, grade, and timestamps
         Schema::create('components', function (Blueprint $table) {
             $table->id();
             $table->string('name');

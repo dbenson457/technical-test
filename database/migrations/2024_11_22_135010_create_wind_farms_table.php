@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        // Create 'wind_farms' table with id, name, location, and timestamps
+        // Create 'wind_farms' table with id, name, long and lat location, and timestamps
         Schema::create('wind_farms', function (Blueprint $table) {
             $table->id();
             $table->string('name');

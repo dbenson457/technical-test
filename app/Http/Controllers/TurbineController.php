@@ -8,25 +8,30 @@ class TurbineController extends Controller
 {
     public function getTurbinesByWindFarm($windFarmId)
     {
+        // Retrieve turbines for the specified wind farm, including their inspections ordered by date
         $turbines = Turbine::where('wind_farm_id', $windFarmId)
             ->with(['inspections' => function ($query) {
                 $query->orderBy('inspection_date', 'desc');
             }])
             ->get()
             ->map(function ($turbine) {
+                // Get the most recent inspection for the turbine
                 $lastInspection = $turbine->inspections->first();
                 return [
                     'id' => $turbine->id,
                     'name' => $turbine->name,
+                    // Format the last inspection date or indicate if not inspected
                     'last_inspected' => $lastInspection
                         ? Carbon::parse($lastInspection->inspection_date)->format('Y-m-d') 
                         : 'Not inspected',
+                    // Calculate components needing attention (grades 4 or 5) out of total components
                     'components_needing_attention' => $turbine->components->count()
                         ? $turbine->components->whereIn('grade', [4, 5])->count() . '/' . $turbine->components->count()
                         : '0/' . $turbine->components->count()
                 ];
             });
 
+        // Return the turbines data as a JSON response
         return response()->json($turbines);
     }
 
@@ -40,10 +45,11 @@ class TurbineController extends Controller
             return response()->json(['error' => 'Turbine not found'], 404);
         }
     
-        // Format and return the response
+        // Format and return the turbine details as a JSON response
         return response()->json([
             'id' => $turbine->id,
             'name' => $turbine->name,
+            // Map each component to include its id, name, and grade (with a fallback if not graded)
             'components' => $turbine->components->map(function ($component) {
                 return [
                     'id' => $component->id,
@@ -51,6 +57,7 @@ class TurbineController extends Controller
                     'grade' => $component->grade ?? 'Not graded', // Fallback if grade is null
                 ];
             }),
+            // Map each inspection to include its date (formatted) and notes (with a fallback if not available)
             'inspections' => $turbine->inspections->map(function ($inspection) {
                 return [
                     'date' => $inspection->inspection_date 
