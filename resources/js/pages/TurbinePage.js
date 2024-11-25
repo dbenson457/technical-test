@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom'; 
-
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 
 const TurbinePage = () => {
     const [turbine, setTurbine] = useState(null);
     const [error, setError] = useState(null);
     const { id } = useParams();
+    const navigate = useNavigate();
+    /* const [searchParams] = useSearchParams();
+    const windFarmId = searchParams.get('windFarmId'); Would've liked to go back to selected farm in Dashboard*/
 
-    useEffect(() => { 
+    useEffect(() => {
         const fetchTurbine = async () => {
             try {
                 const response = await axios.get(`/api/turbine/${id}`);
@@ -18,35 +20,77 @@ const TurbinePage = () => {
             }
         };
         fetchTurbine();
-    }, []);
+    }, [id]);
 
     if (error) {
-        return <div>{error}</div>;
+        return <div className="text-red-500 text-center mt-4">{error}</div>;
     }
 
     if (!turbine) {
-        return <div>Loading...</div>;
+        return <div className="text-center mt-4">Loading...</div>;
     }
 
     return (
-        <div className="p-4">
-            <h2 className="text-2xl font-semibold mb-4">{turbine.name}</h2>
-            <h3 className="text-xl font-medium mb-2">Components</h3>
-            <ul>
-                {turbine.components.map((component, index) => (
-                    <li key={index}>
-                        {component.name} - Grade: {component.grade}
-                    </li>
-                ))}
-            </ul>
-            <h3 className="text-xl font-medium mt-4">Inspections</h3>
-            <ul>
-                {turbine.inspections.map((inspection, index) => (
-                    <li key={index}>
-                        Date: {inspection.date} - Notes: {inspection.notes}
-                    </li>
-                ))}
-            </ul>
+        <div className="p-6">
+            {/* Turbine Header */}
+            <header className="bg-gray-800 text-white p-4 rounded shadow-md mb-6 flex justify-between items-center">
+                <h1 className="text-3xl font-bold">{turbine.name}</h1>
+                <button
+                    className="bg-white text-gray-800 px-4 py-2 rounded shadow font-medium hover:bg-gray-100 transition"
+                    onClick={() => navigate(-1)} // Go back to the previous page
+                >
+                    Back to Dashboard
+                </button>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Components Section */}
+                <div className="bg-white shadow rounded p-4">
+                    <h2 className="text-xl font-semibold mb-4">Components</h2>
+                    <div className="space-y-4">
+                        {turbine.components.map((component, index) => (
+                            <div
+                                key={index}
+                                className="bg-gray-100 p-4 rounded shadow flex justify-between items-center"
+                            >
+                                <span className="font-medium">{component.name}</span>
+                                <span
+                                    className={`font-bold ${
+                                        component.grade >= 4 ? 'text-red-500' : 'text-green-500'
+                                    }`}
+                                >
+                                    Grade: {component.grade}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Inspections Section */}
+                <div className="bg-white shadow rounded p-4">
+                    <h2 className="text-xl font-semibold mb-4">Inspections</h2>
+                    {turbine.inspections.length > 0 ? (
+                        <table className="min-w-full border border-gray-300">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th className="px-4 py-2 border">Date</th>
+                                    <th className="px-4 py-2 border">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {turbine.inspections.map((inspection, index) => (
+                                    <tr key={index}>
+                                        <td className="px-4 py-2 border">{inspection.date}</td>
+                                        <td className="px-4 py-2 border">{inspection.notes}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p className="text-gray-500">No inspections available.</p>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
