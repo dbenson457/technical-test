@@ -16,7 +16,8 @@ class WindFarmSeeder extends Seeder
         foreach (range(1, 10) as $index) {
             DB::table('wind_farms')->insert([
                 'name' => $faker->company,
-                'location' => $faker->city,
+                'latitude' => $faker->latitude,
+                'longitude' => $faker->longitude,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
